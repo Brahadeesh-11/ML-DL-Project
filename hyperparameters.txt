@@ -1,0 +1,11 @@
+Learning rate: controls step size; too large → divergence, too small → slow.
+
+Epochs / iterations: how long to train; watch validation loss.
+
+Regularization (L1/L2): reduces overfitting; adds penalty to weights.
+
+k in KNN: small k → noisy; large k → biased.
+
+n_clusters in KMeans, n_components in PCA, tree depth / n_estimators for ensembles, etc.
+
+Include simple grid search examples using GridSearchCV in scikit-learn.

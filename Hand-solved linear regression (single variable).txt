@@ -1,0 +1,29 @@
+Given dataset: (x, y) = {(1,2), (2,3), (3,5)}. Fit y = w*x + b. Use MSE loss: L = (1/N) Σ (y_i - (w x_i + b))^2.
+
+Compute gradients (analytic):
+
+∂L/∂w = (-2/N) Σ x_i (y_i - (w x_i + b))
+
+∂L/∂b = (-2/N) Σ (y_i - (w x_i + b))
+
+Initialize: w=0.0, b=0.0, learning rate α=0.1, N=3.
+
+Iter 0 (compute loss and grads): Predictions: ŷ = [0,0,0] Errors: e = y - ŷ = [2,3,5]
+
+∂L/∂w = (-2/3) * Σ x_i * e_i = (-2/3) * (12 + 23 + 3*5) = (-2/3) * (2 + 6 + 15) = (-2/3)*23 = -46/3 ≈ -15.3333
+
+∂L/∂b = (-2/3) * Σ e_i = (-2/3) * (2+3+5) = (-2/3)*10 = -20/3 ≈ -6.6667
+
+Gradient descent update: w := w - α*(∂L/∂w) => w = 0 - 0.1*(-15.3333) = 1.53333 b = 0 - 0.1*(-6.6667) = 0.66667
+
+Iter 1: Predictions: ŷ = [1.533331 + 0.66667 = 2.2, 1.533332 + 0.66667 = 3.73333, 1.53333*3 + 0.66667 = 5.26667] Errors: e = y - ŷ = [-0.2, -0.73333, -0.26667]
+
+∂L/∂w = (-2/3) * Σ x_i * e_i = (-2/3) * (1*-0.2 + 2*-0.73333 + 3*-0.26667) = (-2/3)(-0.2 -1.46666 -0.8) = (-2/3)(-2.46666) = 1.64444
+
+∂L/∂b = (-2/3) * Σ e_i = (-2/3) * (-1.2) = 0.8
+
+Update: w = 1.53333 - 0.11.64444 = 1.36889 b = 0.66667 - 0.10.8 = 0.58667
+
+Iter 2: Predictions: ŷ ≈ [1.9556, 3.3245, 4.6933] Errors: e ≈ [0.0444, -0.3245, 0.3067] Compute grads (left as an exercise); parameters move smaller—shows convergence.
+
+This shows gradient descent learning in 3 iterations; you can expand iterations or change α.
