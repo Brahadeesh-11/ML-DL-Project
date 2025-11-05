@@ -1,1 +1,12 @@
-# ML-DL-Project
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+jupyterlab
+tensorflow  # optional for Keras
+fastapi
+uvicorn
+joblib
+pydantic
+pytest
