@@ -1,0 +1,123 @@
+<!-- predictor/templates/predictor/index.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>House Price Predictor</title>
+  <style>
+    body{font-family: system-ui, -apple-system, Roboto, 'Segoe UI', Arial; padding:24px; background:#f7fafc}
+    .card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 6px 20px rgba(16,24,40,0.06);max-width:900px;margin:0 auto}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{font-size:13px;color:#334155}
+    input[type=number]{width:100%;}
+    .row{margin-bottom:12px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    button{background:#0ea5a2;border:none;color:white;padding:10px 14px;border-radius:8px;cursor:pointer}
+    button.secondary{background:#64748b}
+    .result{font-size:20px;font-weight:700;margin-top:10px}
+    .muted{color:#64748b;font-size:13px}
+    .small{font-size:12px;color:#475569}
+    @media (max-width:700px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>House Price Predictor</h2>
+    <p class="muted">This UI calls the server at <code>/api/predict/</code>.</p>
+
+    <div class="grid">
+      <div>
+        <div class="row">
+          <label>Bedrooms</label>
+          <input id="bedrooms" type="number" min="0" step="1" value="3">
+        </div>
+
+        <div class="row">
+          <label>Bathrooms</label>
+          <input id="bathrooms" type="number" min="0" step="0.5" value="2">
+        </div>
+
+        <div class="row">
+          <label>Sqft Living</label>
+          <input id="sqft" type="number" min="0" step="1" value="1500">
+        </div>
+
+        <div class="row">
+          <label>Latitude</label>
+          <input id="lat" type="number" step="0.000001" value="47.5112">
+        </div>
+
+        <div class="row">
+          <label>Longitude</label>
+          <input id="long" type="number" step="0.000001" value="-122.257">
+        </div>
+
+        <div class="row controls">
+          <button id="predict">Predict Price</button>
+          <button class="secondary" id="reset">Reset</button>
+        </div>
+
+        <div class="row">
+          <div class="result" id="prediction">—</div>
+          <div class="small">Predicted price returned by server.</div>
+        </div>
+      </div>
+
+      <div>
+        <h3>Notes</h3>
+        <div class="muted small">Model file should be at <code>model.pkl</code> in project root. Use the included <code>train_and_save.py</code> to train from the uploaded CSV at <code>{{ csv_path }}</code>.</div>
+      </div>
+    </div>
+
+    <hr style="margin:18px 0">
+  </div>
+
+  <script>
+    function setText(id,text){ document.getElementById(id).textContent = text; }
+    async function predictRemote(){
+      const payload = {
+    bedrooms: parseFloat(document.getElementById("bedrooms").value),
+    bathrooms: parseFloat(document.getElementById("bathrooms").value),
+    sqft: parseFloat(document.getElementById("sqft").value),   // 👈 MUST be sqft
+    lat: parseFloat(document.getElementById("lat").value),
+    long: parseFloat(document.getElementById("long").value),
+};
+
+      setText('prediction','Loading...');
+      try{
+        const resp = await fetch('/api/predict/', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        if(!resp.ok){
+          setText('prediction','Error: '+(data.error || resp.statusText));
+          return;
+        }
+        const price = Number(data.price);
+        const fmt = (Math.abs(price) >= 1000) ? price.toLocaleString(undefined,{maximumFractionDigits:0}) : price.toLocaleString(undefined,{maximumFractionDigits:2});
+        setText('prediction',fmt);
+      }catch(e){
+        setText('prediction','Network error');
+        console.error(e);
+      }
+    }
+
+    document.getElementById('predict').addEventListener('click', predictRemote);
+    document.getElementById('reset').addEventListener('click', ()=>{
+      document.getElementById('bedrooms').value=3;
+      document.getElementById('bathrooms').value=2;
+      document.getElementById('sqft').value=1500;
+      document.getElementById('lat').value=47.5112;
+      document.getElementById('long').value=-122.257;
+      setText('prediction','—');
+    });
+
+    document.querySelectorAll('input').forEach(inp=>{
+      inp.addEventListener('keydown',function(e){ if(e.key==='Enter') predictRemote(); });
+    });
+  </script>
+</body>
+</html>
